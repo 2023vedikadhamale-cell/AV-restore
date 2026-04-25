@@ -1,0 +1,231 @@
+.page {
+  padding-top: var(--nav-height);
+}
+
+.pageHeader {
+  padding: 4rem 0 3rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: linear-gradient(180deg, var(--bg-secondary) 0%, transparent 100%);
+}
+
+/* ─── Sidebar ─── */
+.sidebar {
+  position: fixed;
+  left: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+  gap: 0;
+}
+
+.sidebarItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.sidebarLine {
+  width: 2px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebarLineFill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(180deg, var(--accent-cyan), var(--accent-primary));
+  transition: height 0.5s var(--ease-smooth);
+}
+
+.sidebarDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: all 0.3s var(--ease-smooth);
+  position: relative;
+  z-index: 2;
+}
+
+.dotActive {
+  transform: scale(1.4);
+}
+
+.dotDone {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+.sidebarLabel {
+  position: absolute;
+  left: 22px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* ─── Stage Sections ─── */
+.stageSection {
+  padding: 5rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 0.4s;
+}
+
+.stageSectionActive {
+  background: rgba(255, 255, 255, 0.012);
+}
+
+.stageInner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.stageHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stageNum {
+  font-size: 0.875rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  border: 1px solid;
+  border-radius: 6px;
+  padding: 0.2rem 0.6rem;
+  display: inline-block;
+  width: fit-content;
+}
+
+.stageVisual {
+  /* visual area */
+}
+
+/* Corruption demo */
+.splitFrame {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.frameSlot {
+  flex: 1;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-glass);
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.corruptOverlay {
+  position: absolute;
+  inset: 50% 20% 20% 20%;
+  background: #000;
+  border-radius: 4px;
+}
+
+.corruptArrow {
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.frameTag {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+/* Encoding diagram */
+.encodingDiagram {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.encodingRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.encodingBox {
+  flex: 1;
+  padding: 1rem;
+  border: 1px solid;
+  border-radius: 10px;
+  background: var(--bg-glass);
+}
+
+.encodingArrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  width: 100px;
+}
+
+.encodingArrowLine {
+  width: 60px;
+  height: 2px;
+  border-radius: 2px;
+}
+
+.encodingArrowLabel {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  text-align: center;
+}
+
+/* Metrics gauges */
+.metricsGauges {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.videoCard {
+  /* video player wrapper */
+}
+
+/* Corruption demo */
+.corruptionDemo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .stageInner { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+}
