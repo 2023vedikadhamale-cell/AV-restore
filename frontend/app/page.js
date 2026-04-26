@@ -1,14 +1,9 @@
 'use client';
 import { useEffect, useRef } from 'react';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import AnimatedCounter from '@/components/ui/AnimatedCounter';
 import SectionReveal from '@/components/ui/SectionReveal';
-import styles from './hero.module.css';
-
-const HeroScene = dynamic(() => import('@/components/three/HeroScene'), { ssr: false });
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -17,229 +12,311 @@ if (typeof window !== 'undefined') {
 const navCards = [
   {
     href: '/pipeline', label: 'Pipeline', icon: '⬡',
-    desc: 'Walk through all 7 stages of the AV restoration pipeline.',
-    color: 'var(--accent-cyan)', glow: 'rgba(6,182,212,0.15)',
+    desc: 'Walk through all 6 stages of the AV restoration pipeline.',
   },
   {
     href: '/demo', label: 'Live Demo', icon: '▶',
     desc: 'Drag to compare corrupted vs. restored video and audio.',
-    color: 'var(--accent-purple)', glow: 'rgba(139,92,246,0.15)',
-  },
-  {
-    href: '/metrics', label: 'Metrics', icon: '◉',
-    desc: 'Explore SSIM, PSNR, STOI, and LSE-D in an interactive 3D dashboard.',
-    color: 'var(--accent-green)', glow: 'rgba(16,185,129,0.15)',
   },
   {
     href: '/technical', label: 'Technical', icon: '⎔',
     desc: 'Deep-dive into the architecture, algorithms, and evaluation methods.',
-    color: 'var(--accent-amber)', glow: 'rgba(245,158,11,0.15)',
   },
 ];
 
-const metrics = [
-  { label: 'SSIM', value: 0.9962, suffix: '', decimals: 4, desc: 'Structural Similarity', color: '#10b981' },
-  { label: 'PSNR', value: 42.4, suffix: ' dB', decimals: 1, desc: 'Peak Signal-to-Noise Ratio', color: '#6366f1' },
-  { label: 'STOI', value: 0.62, suffix: '', decimals: 2, desc: 'Speech Intelligibility', color: '#f59e0b' },
-  { label: 'Frames', value: 100, suffix: '', decimals: 0, desc: 'Processed per clip', color: '#06b6d4' },
-];
-
 export default function HeroPage() {
-  const scrollY = useRef({ current: 0 });
   const heroRef = useRef(null);
   const titleRef = useRef(null);
   const taglineRef = useRef(null);
-  const scrollIndicatorRef = useRef(null);
+  const ctaRef = useRef(null);
 
   useEffect(() => {
-    const onScroll = () => { scrollY.current.current = window.scrollY; };
-    window.addEventListener('scroll', onScroll, { passive: true });
-
-    // Title char stagger
-    const tl = gsap.timeline({ delay: 1.2 });
+    const tl = gsap.timeline({ delay: 0.2 });
     if (titleRef.current) {
-      const chars = titleRef.current.querySelectorAll('.char');
-      tl.fromTo(chars,
-        { opacity: 0, y: 30, rotateX: -40 },
-        { opacity: 1, y: 0, rotateX: 0, stagger: 0.03, duration: 0.7, ease: 'power3.out' }
+      tl.fromTo(titleRef.current,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
       );
     }
     if (taglineRef.current) {
       tl.fromTo(taglineRef.current,
         { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
+        '-=0.6'
+      );
+    }
+    if (ctaRef.current) {
+      tl.fromTo(ctaRef.current,
+        { opacity: 0, y: 15 },
         { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' },
-        '-=0.3'
+        '-=0.6'
       );
     }
-    if (scrollIndicatorRef.current) {
-      tl.fromTo(scrollIndicatorRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.5 },
-        '+=0.5'
-      );
-      gsap.to(scrollIndicatorRef.current, {
-        y: 8, repeat: -1, yoyo: true, duration: 1.2, ease: 'sine.inOut', delay: 2.5,
-      });
-    }
-
-    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Split title text into char spans for animation
-  const title = 'Audio-Visual Packet Loss Concealment';
-  const charSpans = title.split('').map((ch, i) => (
-    <span key={i} className="char" style={{ display: 'inline-block', whiteSpace: ch === ' ' ? 'pre' : 'normal' }}>
-      {ch}
-    </span>
-  ));
-
   return (
-    <div className={styles.page}>
+    <div style={{ paddingTop: '80px' }}>
+      
       {/* ─── HERO SECTION ─── */}
-      <section className={styles.hero} ref={heroRef}>
-        {/* Full-viewport 3D canvas */}
-        <div className={styles.canvasWrapper}>
-          <HeroScene scrollY={scrollY} />
-        </div>
-
-        {/* Overlay gradient */}
-        <div className={styles.heroOverlay} />
-
-        {/* Hero content */}
-        <div className={styles.heroContent}>
-          <div className={`badge badge-cyan ${styles.badge}`}>
-            <span>Research Project</span>
+      <section
+        ref={heroRef}
+        style={{
+          position: 'relative',
+          paddingTop: '100px',
+          paddingBottom: '140px',
+          textAlign: 'center',
+          overflow: 'hidden',
+          background: 'radial-gradient(ellipse at top, #ffffff 0%, #f8f8f6 100%)',
+        }}
+      >
+        {/* Warm radial glow + secondary accent */}
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none',
+          background: 'radial-gradient(circle at 50% -10%, rgba(251, 191, 36, 0.18) 0%, transparent 55%), radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.06) 0%, transparent 40%)',
+        }} />
+        
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
+          {/* Badge */}
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            padding: '6px 16px', borderRadius: '999px',
+            background: '#fef3c7', color: '#92400e',
+            fontSize: '12px', fontWeight: 700, textTransform: 'uppercase',
+            letterSpacing: '0.05em', marginBottom: '32px',
+          }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }} />
+            Research Project
           </div>
-
-          <h1 ref={titleRef} className={styles.heroTitle} style={{ perspective: '800px' }}>
-            {charSpans}
+          
+          {/* Title */}
+          <h1 ref={titleRef} style={{
+            fontSize: 'clamp(3rem, 7vw, 5.5rem)',
+            fontWeight: 800,
+            color: '#111827',
+            letterSpacing: '-0.05em',
+            lineHeight: 1.05,
+            marginBottom: '28px',
+          }}>
+            Audio-Visual<br />
+            <span style={{ color: '#9ca3af' }}>Packet Loss Concealment</span>
           </h1>
-
-          <p ref={taglineRef} className={styles.heroTagline}>
-            A cross-modal deep learning pipeline that recovers corrupted audio and video streams
-            using complementary signal information — restoring what packet loss destroys.
+          
+          {/* Tagline */}
+          <p ref={taglineRef} style={{
+            fontSize: '1.2rem',
+            color: '#6b7280',
+            maxWidth: '640px',
+            margin: '0 auto 40px',
+            lineHeight: 1.7,
+          }}>
+            A cross-modal deep learning pipeline that recovers corrupted audio and video 
+            streams using complementary signal information. Restoring what packet loss destroys.
           </p>
-
-          <div className={styles.heroCtas}>
-            <Link href="/demo" className="btn btn-primary">
+          
+          {/* CTAs */}
+          <div ref={ctaRef} style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            <Link href="/demo" style={{
+              display: 'inline-flex', alignItems: 'center',
+              padding: '18px 40px', borderRadius: '999px',
+              background: '#111827', color: '#ffffff',
+              fontWeight: 700, fontSize: '1.1rem', textDecoration: 'none',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,0,0,0.18)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0) scale(1)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.12)'; }}
+            >
               Watch Live Demo
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ marginLeft: '8px' }}>
+                <path d="M7.5 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </Link>
-            <Link href="/pipeline" className="btn btn-ghost">
+            <Link href="/pipeline" style={{
+              display: 'inline-flex', alignItems: 'center',
+              padding: '18px 40px', borderRadius: '999px',
+              background: 'transparent', color: '#111827',
+              fontWeight: 600, fontSize: '1.1rem', textDecoration: 'none',
+              border: '1.5px solid #d1d5db',
+              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#111827'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.06)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#d1d5db'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
+            >
               Explore Pipeline
             </Link>
-          </div>
-
-          <div ref={scrollIndicatorRef} className={styles.scrollIndicator}>
-            <span className={styles.scrollText}>Scroll to explore</span>
-            <div className={styles.scrollChevron}>
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* ─── THE PROBLEM ─── */}
-      <section className={styles.problemSection}>
-        <div className="container">
+      {/* ─── THE CHALLENGE ─── */}
+      <section style={{ padding: '96px 0', background: '#ffffff' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px' }}>
           <SectionReveal>
-            <span className="section-label">The Challenge</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+              <span style={{ width: '32px', height: '2px', background: '#d1d5db' }} />
+              <span style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9ca3af' }}>
+                The Challenge
+              </span>
+            </div>
           </SectionReveal>
-          <div className={styles.problemGrid}>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '64px', alignItems: 'center' }}>
             <SectionReveal delay={0.1}>
               <div>
-                <h2 className="h2" style={{ marginBottom: '1.25rem' }}>
-                  Network packet loss
-                  <span className="text-gradient-primary"> destroys communication.</span>
+                <h2 style={{
+                  fontSize: 'clamp(2rem, 4vw, 3rem)',
+                  fontWeight: 700, color: '#111827',
+                  lineHeight: 1.15, letterSpacing: '-0.03em', marginBottom: '24px',
+                }}>
+                  Network packet loss<br />
+                  <span style={{ color: '#9ca3af' }}>destroys communication.</span>
                 </h2>
-                <p style={{ marginBottom: '1rem' }}>
+                <p style={{ fontSize: '1.1rem', color: '#6b7280', lineHeight: 1.7, marginBottom: '24px', maxWidth: '600px' }}>
                   In video conferencing and streaming, even 10–30% packet loss can render
                   speech unintelligible and leave faces with corrupted regions — especially
                   around the mouth area where lip movement encodes crucial information.
                 </p>
-                <p>
+                <p style={{ fontSize: '1.1rem', color: '#6b7280', lineHeight: 1.7, maxWidth: '600px' }}>
                   Traditional codecs attempt error concealment, but they work on single streams
-                  independently. Our pipeline leverages the <strong style={{ color: 'var(--text-primary)' }}>cross-modal correlation</strong> between
-                  audio and video — using each to help restore the other.
+                  independently. Our pipeline leverages the{' '}
+                  <strong style={{ color: '#111827', fontWeight: 600 }}>cross-modal correlation</strong>{' '}
+                  between audio and video — using each to help restore the other.
                 </p>
               </div>
             </SectionReveal>
-
-            <SectionReveal delay={0.2} direction="left">
-              <div className={styles.frameComparison}>
-                {['Original', 'Corrupted', 'Restored'].map((label, i) => {
-                  const colors = ['#10b981', '#f43f5e', '#6366f1'];
-                  const imgNames = ['original', 'corrupted', 'restored'];
-                  return (
-                    <div key={i} className={styles.frameCard} style={{ borderColor: `${colors[i]}40` }}>
-                      <div className={styles.framePlaceholder} style={{ background: `${colors[i]}08` }}>
-                        <img
-                          src={`/assets/frames/${imgNames[i]}_frame030.png`}
-                          alt={`${label} frame`}
-                          onError={(e) => { e.target.style.display = 'none'; }}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
-                        />
-                        <div className={styles.frameOverlay} style={{ background: `${colors[i]}20` }} />
-                      </div>
-                      <span className={styles.frameLabel} style={{ color: colors[i] }}>{label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </SectionReveal>
           </div>
         </div>
       </section>
 
-      {/* ─── KEY METRICS ─── */}
-      <section className={`${styles.metricsSection} dot-grid`}>
-        <div className="container">
+      {/* ─── DEMO PREVIEW ─── */}
+      <section style={{ padding: '96px 0', background: '#f8f8f6' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px' }}>
           <SectionReveal>
-            <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-              <span className="section-label" style={{ justifyContent: 'center' }}>Results</span>
-              <h2 className="h2" style={{ marginTop: '1rem' }}>
-                Restoration that <span className="text-gradient-primary">speaks for itself</span>
+            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', marginBottom: '16px' }}>
+                <span style={{ width: '24px', height: '2px', background: '#d1d5db' }} />
+                <span style={{ fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#9ca3af' }}>
+                  Demo Preview
+                </span>
+                <span style={{ width: '24px', height: '2px', background: '#d1d5db' }} />
+              </div>
+              <h2 style={{
+                fontSize: 'clamp(2rem, 4vw, 3rem)',
+                fontWeight: 700, color: '#111827',
+                lineHeight: 1.15, letterSpacing: '-0.03em',
+              }}>
+                See the restoration in action
               </h2>
             </div>
           </SectionReveal>
 
-          <div className={styles.metricsGrid}>
-            {metrics.map((m, i) => (
-              <SectionReveal key={i} delay={i * 0.1}>
-                <div className="glass-card" style={{ textAlign: 'center', borderColor: `${m.color}30` }}>
-                  <div style={{ fontSize: '3.5rem', fontWeight: 900, lineHeight: 1, color: m.color, marginBottom: '0.5rem', fontFamily: 'var(--font-sans)' }}>
-                    <AnimatedCounter value={m.value} decimals={m.decimals} suffix={m.suffix} />
+          <SectionReveal delay={0.15}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: '24px',
+            }}>
+              {[
+                { label: 'Corrupted Input', video: '/corrupted_video.mp4' },
+                { label: 'Restored Output', video: '/Restored_video.mp4' }
+              ].map((item, i) => (
+                <div key={i} style={{
+                  background: '#ffffff',
+                  borderRadius: '24px',
+                  overflow: 'hidden',
+                  border: '1px solid rgba(0,0,0,0.06)',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.06)',
+                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 20px 50px rgba(0,0,0,0.1)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.06)'; }}
+                >
+                  <div style={{ width: '100%', aspectRatio: '16/9', background: '#f3f4f6' }}>
+                    <video 
+                      src={item.video} 
+                      controls playsInline 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
                   </div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>{m.label}</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{m.desc}</div>
+                  <div style={{ padding: '20px 24px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#9ca3af', marginBottom: '4px' }}>
+                      {i === 0 ? 'Before' : 'After'}
+                    </div>
+                    <div style={{ fontSize: '18px', fontWeight: 700, color: '#111827' }}>{item.label}</div>
+                  </div>
                 </div>
-              </SectionReveal>
-            ))}
-          </div>
+              ))}
+            </div>
+          </SectionReveal>
         </div>
       </section>
 
-      {/* ─── NAV CARDS ─── */}
-      <section className={styles.navSection}>
-        <div className="container">
+      {/* ─── NAV CARDS / EXPLORE ─── */}
+      <section style={{ padding: '96px 0', background: '#ffffff', borderTop: '1px solid #f3f4f6' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px' }}>
           <SectionReveal>
-            <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-              <span className="section-label" style={{ justifyContent: 'center' }}>Explore</span>
-              <h2 className="h2" style={{ marginTop: '1rem' }}>
+            <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+              <h2 style={{
+                fontSize: 'clamp(2rem, 4vw, 3rem)',
+                fontWeight: 700, color: '#111827',
+                lineHeight: 1.15, letterSpacing: '-0.03em', marginBottom: '16px',
+              }}>
                 Dive deeper into the research
               </h2>
+              <p style={{ fontSize: '1.1rem', color: '#6b7280', maxWidth: '560px', margin: '0 auto' }}>
+                Explore the methodology, inspect the pipeline, or play with the interactive demo.
+              </p>
             </div>
           </SectionReveal>
 
-          <div className={styles.navCardsGrid}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
             {navCards.map((card, i) => (
               <SectionReveal key={i} delay={i * 0.1}>
-                <Link href={card.href} className={styles.navCard} style={{ '--card-color': card.color, '--card-glow': card.glow }}>
-                  <div className={styles.navCardIcon} style={{ color: card.color }}>{card.icon}</div>
-                  <h3 className={styles.navCardLabel}>{card.label}</h3>
-                  <p className={styles.navCardDesc}>{card.desc}</p>
-                  <div className={styles.navCardArrow} style={{ color: card.color }}>
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                <Link href={card.href} style={{
+                  display: 'block',
+                  background: '#ffffff',
+                  borderRadius: '24px',
+                  padding: '40px 32px',
+                  border: '1px solid rgba(0,0,0,0.06)',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                  height: '100%',
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.03)',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.border = '1px solid rgba(0,0,0,0.1)';
+                  e.currentTarget.style.boxShadow = '0 20px 50px rgba(0,0,0,0.08)';
+                  e.currentTarget.style.transform = 'translateY(-6px)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.border = '1px solid rgba(0,0,0,0.06)';
+                  e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.03)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+                >
+                  <div style={{
+                    width: '56px', height: '56px',
+                    background: '#f8f8f6', borderRadius: '16px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: '24px', marginBottom: '24px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.04)',
+                    border: '1px solid rgba(0,0,0,0.04)',
+                  }}>
+                    {card.icon}
+                  </div>
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#111827', marginBottom: '12px' }}>
+                    {card.label}
+                  </h3>
+                  <p style={{ fontSize: '1rem', color: '#6b7280', lineHeight: 1.6, marginBottom: '24px' }}>
+                    {card.desc}
+                  </p>
+                  <div style={{ display: 'flex', alignItems: 'center', color: '#111827', fontWeight: 600, fontSize: '0.95rem' }}>
+                    Explore
+                    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style={{ marginLeft: '8px' }}>
+                      <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                   </div>
                 </Link>
               </SectionReveal>
@@ -247,6 +324,40 @@ export default function HeroPage() {
           </div>
         </div>
       </section>
+      
+      {/* ─── FOOTER CTA ─── */}
+      <section style={{ padding: '128px 24px', background: '#fbbf24', textAlign: 'center' }}>
+        <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+          <h2 style={{
+            fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
+            fontWeight: 800, color: '#111827',
+            lineHeight: 1.1, letterSpacing: '-0.03em', marginBottom: '24px',
+          }}>
+            Ready to experience it?
+          </h2>
+          <p style={{ fontSize: '1.2rem', color: '#78350f', marginBottom: '40px', lineHeight: 1.7, fontWeight: 500 }}>
+            Try the interactive demonstration to see the real-time audio-visual 
+            restoration capabilities of our model.
+          </p>
+          <Link href="/demo" style={{
+            display: 'inline-flex',
+            alignItems: 'center', justifyContent: 'center',
+            padding: '16px 40px',
+            borderRadius: '999px',
+            background: '#111827', color: '#ffffff',
+            fontWeight: 700, fontSize: '1.1rem',
+            textDecoration: 'none',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+            transition: 'all 0.3s ease',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.2)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.15)'; }}
+          >
+            Open Interactive Demo
+          </Link>
+        </div>
+      </section>
+      
     </div>
   );
 }
