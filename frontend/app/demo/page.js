@@ -1,186 +1,313 @@
 'use client';
-import { useState, useRef, useEffect, useCallback } from 'react';
-import dynamic from 'next/dynamic';
-import { Canvas } from '@react-three/fiber';
-import { gsap } from 'gsap';
-import VideoSlider from '@/components/ui/VideoSlider';
-import WaveformViz from '@/components/ui/WaveformViz';
-import styles from './demo.module.css';
-
-// Lazy-load the 3D background
-const IcosahedronBg = dynamic(() => import('@/components/three/IcosahedronBg'), { ssr: false });
+import { useState, useRef, useCallback } from 'react';
+import Link from 'next/link';
 
 const MODES = [
   { id: 'video', label: 'Video Comparison', icon: '▶' },
   { id: 'audio', label: 'Audio Comparison', icon: '🔊' },
-  { id: 'sxs',   label: 'Side-by-Side',    icon: '⬛⬛' },
-];
-
-const AUDIO_TRACKS = [
-  { id: 'original',  label: 'Original',  src: '/assets/audio/original.wav',  color: '#10b981' },
-  { id: 'corrupted', label: 'Corrupted', src: '/assets/audio/corrupted.wav', color: '#f43f5e' },
-  { id: 'restored',  label: 'Restored',  src: '/assets/audio/restored.wav',  color: '#6366f1' },
 ];
 
 export default function DemoPage() {
   const [mode, setMode] = useState('video');
-  const [audioTrack, setAudioTrack] = useState('original');
-  const [playing, setPlaying] = useState(false);
-  const audioRef = useRef(null);
-  const viewportRef = useRef(null);
-  const tabsRef = useRef(null);
-
-  // Page entrance animation
-  useEffect(() => {
-    if (viewportRef.current) {
-      gsap.fromTo(viewportRef.current,
-        { scale: 0.88, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.9, ease: 'back.out(1.4)', delay: 0.2 }
-      );
-    }
-  }, []);
-
-  const togglePlay = useCallback(() => {
-    const a = audioRef.current;
-    if (!a) return;
-    if (playing) { a.pause(); setPlaying(false); }
-    else { a.play(); setPlaying(true); }
-  }, [playing]);
-
-  const switchAudio = useCallback((id) => {
-    const a = audioRef.current;
-    setAudioTrack(id);
-    if (a) {
-      const wasPlaying = !a.paused;
-      a.src = AUDIO_TRACKS.find(t => t.id === id)?.src || '';
-      a.load();
-      if (wasPlaying) a.play();
-    }
-  }, []);
-
-  const currentTrack = AUDIO_TRACKS.find(t => t.id === audioTrack);
 
   return (
-    <div className={styles.page}>
-      {/* Subtle 3D background */}
-      <div className={styles.bgCanvas}>
-        <IcosahedronBg />
-      </div>
+    <div style={{ paddingTop: '80px', background: 'radial-gradient(ellipse at top, #ffffff 0%, #f8f8f6 100%)', minHeight: '100vh' }}>
 
-      <div className={styles.content}>
-        <div className="container">
-          {/* Header */}
-          <div className={styles.header}>
-            <span className="section-label">Interactive Demo</span>
-            <h1 className="h1" style={{ marginTop: '0.75rem' }}>
-              See the <span className="text-gradient-primary">Difference</span>
-            </h1>
-            <p style={{ marginTop: '0.75rem', maxWidth: '55ch' }}>
-              Drag the slider to reveal the restoration. Toggle between video and audio comparison modes.
-            </p>
+      {/* ─── HERO ─── */}
+      <section style={{ padding: '80px 24px 48px', textAlign: 'center' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            fontSize: '13px', fontWeight: 700, textTransform: 'uppercase',
+            letterSpacing: '0.1em', color: '#9ca3af', marginBottom: '20px',
+          }}>
+            <span style={{ width: '24px', height: '2px', background: '#d1d5db' }} />
+            Interactive Demo
+            <span style={{ width: '24px', height: '2px', background: '#d1d5db' }} />
           </div>
+          <h1 style={{
+            fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+            fontWeight: 800, color: '#111827',
+            letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '20px',
+          }}>
+            See the<br />
+            <span style={{ color: '#9ca3af' }}>Difference</span>
+          </h1>
+          <p style={{
+            fontSize: '1.15rem', color: '#6b7280',
+            lineHeight: 1.7, maxWidth: '550px', margin: '0 auto',
+          }}>
+            Compare corrupted and restored video and audio side-by-side.
+            Play each to hear and see the restoration quality.
+          </p>
+        </div>
+      </section>
 
-          {/* Mode tabs */}
-          <div ref={tabsRef} className={styles.tabs}>
-            {MODES.map(m => (
+      {/* ─── MODE TABS ─── */}
+      <section style={{ padding: '0 24px 48px' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <div style={{
+            display: 'flex', gap: '8px',
+            background: '#ffffff', borderRadius: '16px',
+            padding: '6px', border: '1px solid #e5e7eb',
+            width: 'fit-content', margin: '0 auto',
+          }}>
+            {MODES.map((m) => (
               <button
                 key={m.id}
-                className={`${styles.tab} ${mode === m.id ? styles.tabActive : ''}`}
                 onClick={() => setMode(m.id)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  padding: '12px 24px', borderRadius: '12px',
+                  border: 'none', cursor: 'pointer',
+                  fontSize: '14px', fontWeight: 600,
+                  background: mode === m.id ? '#111827' : 'transparent',
+                  color: mode === m.id ? '#ffffff' : '#6b7280',
+                  transition: 'all 0.3s ease',
+                }}
               >
                 <span>{m.icon}</span>
                 <span>{m.label}</span>
               </button>
             ))}
           </div>
-
-          {/* Video viewport */}
-          <div ref={viewportRef} className={styles.viewport}>
-            {mode === 'video' && (
-              <VideoSlider
-                leftSrc="/assets/videos/corrupted.mp4"
-                rightSrc="/assets/videos/restored.mp4"
-                leftLabel="Corrupted"
-                rightLabel="Restored"
-                className={styles.slider}
-              />
-            )}
-
-            {mode === 'audio' && (
-              <div className={styles.audioMode}>
-                <div className={styles.waveformPanel}>
-                  <WaveformViz audioUrl="/assets/audio/corrupted.wav" color="#f43f5e" label="Corrupted Audio" height={100} />
-                </div>
-                <div className={styles.waveformPanel}>
-                  <WaveformViz audioUrl="/assets/audio/restored.wav" color="#10b981" label="Restored Audio" height={100} />
-                </div>
-
-                <div className={styles.audioControls}>
-                  {AUDIO_TRACKS.map(track => (
-                    <button
-                      key={track.id}
-                      className={`${styles.audioBtn} ${audioTrack === track.id ? styles.audioBtnActive : ''}`}
-                      style={audioTrack === track.id ? { borderColor: track.color, color: track.color, background: `${track.color}15` } : {}}
-                      onClick={() => switchAudio(track.id)}
-                    >
-                      {track.label}
-                    </button>
-                  ))}
-                  <button className={styles.playBtn} onClick={togglePlay}>
-                    {playing ? '⏸' : '▶'} {playing ? 'Pause' : 'Play'}
-                  </button>
-                </div>
-
-                <audio ref={audioRef} src={currentTrack?.src} onEnded={() => setPlaying(false)} />
-              </div>
-            )}
-
-            {mode === 'sxs' && (
-              <div className={styles.sxsMode}>
-                <video
-                  src="/assets/videos/side_by_side.mp4"
-                  controls
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  style={{ width: '100%', borderRadius: '16px', border: '1px solid var(--border-subtle)' }}
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Info row */}
-          <div className={styles.infoRow}>
-            {[
-              { label: 'Left / Top', value: mode === 'sxs' ? 'Three-panel view' : 'Corrupted stream', color: '#f43f5e' },
-              { label: 'Right / Bottom', value: mode === 'sxs' ? 'Side-by-side' : 'Restored stream', color: '#10b981' },
-              { label: 'Method', value: 'Cross-Modal Attention + STFT', color: '#6366f1' },
-            ].map((item, i) => (
-              <div key={i} className={styles.infoItem}>
-                <span className={styles.infoLabel}>{item.label}</span>
-                <span className={styles.infoValue} style={{ color: item.color }}>{item.value}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Quick metrics */}
-          <div className={styles.quickMetrics}>
-            {[
-              { label: 'SSIM Improvement', value: '+0.48', sub: '0.516 → 0.996', color: '#10b981' },
-              { label: 'PSNR Gain',        value: '+15 dB',  sub: '27.2 → 42.4 dB', color: '#6366f1' },
-              { label: 'STOI Score',       value: '0.62',   sub: 'Intelligibility', color: '#f59e0b' },
-              { label: 'Frames Restored',  value: '100',    sub: 'Per clip',         color: '#06b6d4' },
-            ].map((m, i) => (
-              <div key={i} className="glass-card" style={{ textAlign: 'center', padding: '1.25rem', borderColor: `${m.color}30` }}>
-                <div style={{ fontSize: '2rem', fontWeight: 900, color: m.color, fontFamily: 'var(--font-sans)' }}>{m.value}</div>
-                <div style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '0.25rem' }}>{m.label}</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.125rem' }}>{m.sub}</div>
-              </div>
-            ))}
-          </div>
         </div>
-      </div>
+      </section>
+
+      {/* ─── VIDEO COMPARISON ─── */}
+      {mode === 'video' && (
+        <section style={{ padding: '0 24px 96px' }}>
+          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+            <div style={{
+              display: 'grid', gridTemplateColumns: '1fr 1fr',
+              gap: '24px',
+            }}>
+              {[
+                { label: 'Corrupted Input', sub: 'Before restoration', video: '/corrupted_video.mp4', accent: '#f43f5e' },
+                { label: 'Restored Output', sub: 'After restoration', video: '/Restored_video.mp4', accent: '#10b981' },
+              ].map((item, i) => (
+                <div key={i} style={{
+                  background: '#ffffff', borderRadius: '20px',
+                  overflow: 'hidden', border: `1px solid ${item.accent}20`,
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.06)',
+                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 20px 50px rgba(0,0,0,0.1)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.06)'; }}
+                >
+                  <div style={{
+                    width: '100%', aspectRatio: '16/9', background: '#111827',
+                  }}>
+                    <video
+                      src={item.video}
+                      controls
+                      playsInline
+                      style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    />
+                  </div>
+                  <div style={{ padding: '20px 24px' }}>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: '8px',
+                      marginBottom: '4px',
+                    }}>
+                      <div style={{
+                        width: '8px', height: '8px', borderRadius: '50%',
+                        background: item.accent,
+                      }} />
+                      <span style={{
+                        fontSize: '11px', fontWeight: 700, textTransform: 'uppercase',
+                        letterSpacing: '0.08em', color: item.accent,
+                      }}>{item.sub}</span>
+                    </div>
+                    <div style={{ fontSize: '18px', fontWeight: 700, color: '#111827' }}>
+                      {item.label}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Original video */}
+            <div style={{ marginTop: '24px' }}>
+              <div style={{
+                background: '#ffffff', borderRadius: '20px',
+                overflow: 'hidden', border: '1px solid #e5e7eb',
+                boxShadow: '0 4px 24px rgba(0,0,0,0.04)',
+              }}>
+                <div style={{
+                  width: '100%', aspectRatio: '21/9', background: '#111827',
+                }}>
+                  <video
+                    src="/original_video.mp4"
+                    controls
+                    playsInline
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  />
+                </div>
+                <div style={{ padding: '20px 24px' }}>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    marginBottom: '4px',
+                  }}>
+                    <div style={{
+                      width: '8px', height: '8px', borderRadius: '50%',
+                      background: '#6366f1',
+                    }} />
+                    <span style={{
+                      fontSize: '11px', fontWeight: 700, textTransform: 'uppercase',
+                      letterSpacing: '0.08em', color: '#6366f1',
+                    }}>Reference</span>
+                  </div>
+                  <div style={{ fontSize: '18px', fontWeight: 700, color: '#111827' }}>
+                    Original Video
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Info row */}
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '12px', marginTop: '24px',
+            }}>
+              {[
+                { label: 'Left Panel', value: 'Corrupted stream', color: '#f43f5e' },
+                { label: 'Right Panel', value: 'Restored stream', color: '#10b981' },
+                { label: 'Method', value: 'Cross-Modal Attention + STFT', color: '#6366f1' },
+              ].map((item, i) => (
+                <div key={i} style={{
+                  background: '#ffffff', borderRadius: '14px',
+                  padding: '16px 20px', border: '1px solid #e5e7eb',
+                }}>
+                  <div style={{
+                    fontSize: '11px', fontWeight: 700, textTransform: 'uppercase',
+                    letterSpacing: '0.08em', color: '#9ca3af', marginBottom: '4px',
+                  }}>{item.label}</div>
+                  <div style={{
+                    fontSize: '14px', fontWeight: 600, color: item.color,
+                  }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ─── AUDIO COMPARISON ─── */}
+      {mode === 'audio' && (
+        <section style={{ padding: '0 24px 96px' }}>
+          <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {[
+                { label: 'Original Audio', sub: 'Clean reference audio', src: '/original_audio.wav', accent: '#6366f1' },
+                { label: 'Corrupted Audio', sub: 'Audio with packet loss gaps', src: '/corrupted_audio.wav', accent: '#f43f5e' },
+                { label: 'Restored Audio', sub: 'After STFT interpolation + Griffin-Lim', src: '/restored_audio.wav', accent: '#10b981' },
+              ].map((item, i) => (
+                <div key={i} style={{
+                  background: '#ffffff', borderRadius: '20px',
+                  padding: '28px 32px', border: `1px solid ${item.accent}25`,
+                  boxShadow: '0 4px 24px rgba(0,0,0,0.04)',
+                }}>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: '12px',
+                    marginBottom: '20px',
+                  }}>
+                    <div style={{
+                      width: '40px', height: '40px', borderRadius: '12px',
+                      background: `${item.accent}10`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '18px',
+                    }}>🔊</div>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '16px', color: '#111827' }}>
+                        {item.label}
+                      </div>
+                      <div style={{ fontSize: '13px', color: '#9ca3af' }}>
+                        {item.sub}
+                      </div>
+                    </div>
+                  </div>
+                  <audio
+                    controls
+                    src={item.src}
+                    style={{ width: '100%', height: '48px', borderRadius: '8px' }}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Audio method info */}
+            <div style={{
+              display: 'grid', gridTemplateColumns: '1fr 1fr',
+              gap: '12px', marginTop: '24px',
+            }}>
+              {[
+                { label: 'Short Gaps (≤100ms)', method: 'Linear crossfade from boundary segments with 20ms fade windows', color: '#10b981' },
+                { label: 'Long Gaps (>100ms)', method: 'STFT log-magnitude interpolation + Griffin-Lim phase reconstruction (32 iter)', color: '#f59e0b' },
+              ].map((item, i) => (
+                <div key={i} style={{
+                  background: '#ffffff', borderRadius: '16px',
+                  padding: '24px', border: '1px solid #e5e7eb',
+                }}>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    marginBottom: '10px',
+                  }}>
+                    <div style={{
+                      width: '10px', height: '10px', borderRadius: '50%',
+                      background: item.color,
+                    }} />
+                    <span style={{ fontWeight: 700, fontSize: '14px', color: '#111827' }}>
+                      {item.label}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', lineHeight: 1.6 }}>
+                    {item.method}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ─── FOOTER CTA ─── */}
+      <section style={{ padding: '96px 24px', background: '#fbbf24', textAlign: 'center' }}>
+        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+          <h2 style={{
+            fontSize: 'clamp(2rem, 4vw, 3rem)',
+            fontWeight: 800, color: '#111827',
+            letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: '16px',
+          }}>
+            Explore the pipeline
+          </h2>
+          <p style={{ fontSize: '1.1rem', color: '#78350f', lineHeight: 1.7, marginBottom: '32px', fontWeight: 500 }}>
+            See how each stage of the restoration process works, step by step.
+          </p>
+          <Link href="/pipeline" style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            padding: '14px 36px', borderRadius: '999px',
+            background: '#111827', color: '#ffffff',
+            fontWeight: 700, fontSize: '1rem', textDecoration: 'none',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+            transition: 'all 0.3s ease',
+          }}>
+            View Pipeline →
+          </Link>
+        </div>
+      </section>
+
+      {/* Responsive */}
+      <style jsx global>{`
+        @media (max-width: 768px) {
+          div[style*="grid-template-columns: 1fr 1fr"] {
+            grid-template-columns: 1fr !important;
+          }
+          div[style*="grid-template-columns: repeat(3"] {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }

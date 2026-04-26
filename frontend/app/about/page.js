@@ -1,201 +1,251 @@
 'use client';
-import dynamic from 'next/dynamic';
-import { Canvas } from '@react-three/fiber';
-import { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { TorusKnot } from '@react-three/drei';
-import { EffectComposer, Bloom, ChromaticAberration } from '@react-three/postprocessing';
-import { BlendFunction } from 'postprocessing';
-import SectionReveal from '@/components/ui/SectionReveal';
-import styles from './about.module.css';
+import Link from 'next/link';
 
-function TorusKnotBg() {
-  const ref = useRef();
-  useFrame((state) => {
-    if (ref.current) {
-      ref.current.rotation.x = state.clock.elapsedTime * 0.07;
-      ref.current.rotation.y = state.clock.elapsedTime * 0.12;
-    }
-  });
-  return (
-    <TorusKnot ref={ref} args={[2, 0.5, 128, 32]}>
-      <meshStandardMaterial color="#6366f1" transparent opacity={0.08} wireframe />
-    </TorusKnot>
-  );
-}
-
-const TECH_STACK = [
-  { name: 'PyTorch',        emoji: '🔥', color: '#ee4c2c', desc: 'Deep learning framework'    },
-  { name: 'Wav2Vec2',       emoji: '🎙️', color: '#06b6d4', desc: 'Audio embeddings'            },
-  { name: 'HuggingFace',    emoji: '🤗', color: '#f59e0b', desc: 'Model hub & pipelines'       },
-  { name: 'MediaPipe',      emoji: '👁️', color: '#10b981', desc: 'Face landmark detection'     },
-  { name: 'OpenCV',         emoji: '📷', color: '#6366f1', desc: 'Video frame processing'      },
-  { name: 'Librosa',        emoji: '🎵', color: '#8b5cf6', desc: 'Audio signal processing'     },
-  { name: 'Scikit-image',   emoji: '🖼️', color: '#ec4899', desc: 'Image quality metrics'       },
-  { name: 'ffmpeg',         emoji: '🎬', color: '#f43f5e', desc: 'Video encoding & muxing'     },
-  { name: 'Next.js 15',     emoji: '⚡', color: '#f1f5f9', desc: 'React framework (this site)' },
-  { name: 'Three.js / R3F', emoji: '🌐', color: '#06b6d4', desc: '3D scenes (this site)'       },
-  { name: 'GSAP',           emoji: '🎞️', color: '#88ce02', desc: 'Animations (this site)'      },
-  { name: 'Lenis',          emoji: '🌊', color: '#8b5cf6', desc: 'Smooth scroll'               },
+const PROJECT_INFO = [
+  { label: 'Project Title', value: 'Cross-Modal Audio-Visual Packet Loss Concealment', icon: '📄' },
+  { label: 'Context', value: 'B.E. Capstone Project — Semester VI (2025–26)', icon: '🎓' },
+  { label: 'Approach', value: 'Retrieval-based cross-modal restoration (no end-to-end training)', icon: '🔬' },
 ];
 
-const ACKNOWLEDGEMENTS = [
+const LINKS = [
   {
-    name: 'facebook/wav2vec2-base',
-    desc: 'Pre-trained self-supervised audio representation model used for extracting 768-dimensional embeddings from 16kHz speech.',
+    label: 'GitHub Repository',
+    desc: 'Full pipeline source code, evaluation scripts, and batch generation tools.',
+    href: 'https://github.com/sudarshan026/AV-Restoration',
+    icon: '⬡',
+    color: '#111827',
+  },
+  {
+    label: 'Wav2Vec2 — HuggingFace',
+    desc: 'Pre-trained self-supervised audio model used for 768-dim speech embeddings.',
+    href: 'https://huggingface.co/facebook/wav2vec2-base',
+    icon: '🎙️',
     color: '#06b6d4',
-    link: 'https://huggingface.co/facebook/wav2vec2-base',
   },
   {
-    name: 'MediaPipe Face Mesh',
-    desc: '468-point face landmark detection used to precisely locate and extract the mouth region across video frames.',
+    label: 'MediaPipe Face Mesh',
+    desc: '468-point face landmark detection used to extract mouth regions.',
+    href: 'https://google.github.io/mediapipe/',
+    icon: '👁️',
     color: '#10b981',
-    link: 'https://google.github.io/mediapipe/',
   },
   {
-    name: 'Griffin-Lim Algorithm',
-    desc: 'Phase reconstruction algorithm used to convert interpolated STFT magnitude spectrograms back to time-domain waveforms.',
+    label: 'Griffin-Lim / Librosa',
+    desc: 'Phase reconstruction algorithm for converting STFT magnitudes back to waveforms.',
+    href: 'https://librosa.org',
+    icon: '🔊',
     color: '#8b5cf6',
-    link: 'https://librosa.org',
   },
   {
-    name: 'CIE LAB Color Transfer',
-    desc: 'Reinhard et al. (2001) color transfer technique applied in LAB space to maintain color consistency in restored mouth regions.',
+    label: 'CIE LAB Color Transfer',
+    desc: 'Reinhard et al. (2001) — color transfer in LAB space for visual consistency.',
+    href: 'https://ieeexplore.ieee.org/document/946629',
+    icon: '🎨',
     color: '#f59e0b',
-    link: 'https://ieeexplore.ieee.org/document/946629',
   },
 ];
 
 export default function AboutPage() {
   return (
-    <div className={styles.page}>
-      {/* 3D background */}
-      <div className={styles.bg3D}>
-        <Canvas camera={{ position: [0, 0, 7], fov: 50 }} gl={{ alpha: true }} style={{ background: 'transparent' }} dpr={[1, 1.5]}>
-          <ambientLight intensity={0.5} />
-          <pointLight position={[4, 4, 4]} intensity={0.5} color="#6366f1" />
-          <TorusKnotBg />
-          <EffectComposer>
-            <Bloom luminanceThreshold={0.1} intensity={0.6} />
-          </EffectComposer>
-        </Canvas>
-      </div>
+    <div style={{ paddingTop: '80px', background: 'radial-gradient(ellipse at top, #ffffff 0%, #f8f8f6 100%)', minHeight: '100vh' }}>
 
-      <div className={styles.content}>
-        {/* Hero */}
-        <header className={styles.hero}>
-          <SectionReveal>
-            <div className="badge badge-primary" style={{ margin: '0 auto 1.5rem', width: 'fit-content' }}>
-              Capstone Project · 2025–26
-            </div>
-            <h1 className="h1" style={{ textAlign: 'center' }}>
-              About <span className="text-gradient-primary">AV-Restoration</span>
-            </h1>
-            <p style={{ textAlign: 'center', maxWidth: '55ch', margin: '1.5rem auto 0', fontSize: '1.1rem' }}>
-              A cross-modal deep learning research project for audio-visual packet loss concealment,
-              developed as a Semester VI Capstone at our institution.
-            </p>
-          </SectionReveal>
-        </header>
+      {/* ─── HERO ─── */}
+      <section style={{ padding: '80px 24px 64px', textAlign: 'center' }}>
+        <div style={{ maxWidth: '750px', margin: '0 auto' }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            padding: '6px 16px', borderRadius: '999px',
+            background: '#fef3c7', color: '#92400e',
+            fontSize: '12px', fontWeight: 700, textTransform: 'uppercase',
+            letterSpacing: '0.05em', marginBottom: '28px',
+          }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }} />
+            Capstone Project · 2025–26
+          </div>
 
-        <div className="container">
-          {/* Project info */}
-          <SectionReveal>
-            <div className={styles.infoCards}>
-              {[
-                { label: 'Project Title', value: 'Cross-Modal Audio-Visual Packet Loss Concealment', icon: '📄' },
-                { label: 'Context', value: 'B.E. Capstone Project — Semester VI (2025–26)', icon: '🎓' },
-                { label: 'Approach', value: 'Retrieval-based cross-modal restoration (no end-to-end training)', icon: '🔬' },
-                { label: 'GitHub', value: 'sudarshan026/AV-Restoration', icon: '⬡', link: 'https://github.com/sudarshan026/AV-Restoration' },
-              ].map((item, i) => (
-                <div key={i} className={`glass-card ${styles.infoCard}`}>
-                  <span className={styles.infoIcon}>{item.icon}</span>
-                  <div>
-                    <div className={styles.infoLabel}>{item.label}</div>
-                    {item.link ? (
-                      <a href={item.link} target="_blank" rel="noopener noreferrer" className={styles.infoLink}>
-                        {item.value} ↗
-                      </a>
-                    ) : (
-                      <div className={styles.infoValue}>{item.value}</div>
-                    )}
+          <h1 style={{
+            fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+            fontWeight: 800, color: '#111827',
+            letterSpacing: '-0.04em', lineHeight: 1.1, marginBottom: '20px',
+          }}>
+            About<br />
+            <span style={{ color: '#9ca3af' }}>AV-Restoration</span>
+          </h1>
+          <p style={{
+            fontSize: '1.15rem', color: '#6b7280',
+            lineHeight: 1.7, maxWidth: '600px', margin: '0 auto',
+          }}>
+            A cross-modal deep learning research project for audio-visual
+            packet loss concealment — restoring what network degradation destroys.
+          </p>
+        </div>
+      </section>
+
+      {/* ─── PROJECT OVERVIEW ─── */}
+      <section style={{ padding: '0 24px 80px' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '12px',
+            marginBottom: '32px',
+          }}>
+            <span style={{
+              fontSize: '13px', fontWeight: 800, color: '#6366f1',
+              textTransform: 'uppercase', letterSpacing: '0.1em',
+            }}>01</span>
+            <span style={{ flex: 1, height: '1px', background: '#e5e7eb' }} />
+            <span style={{
+              fontSize: '13px', fontWeight: 700, color: '#9ca3af',
+              textTransform: 'uppercase', letterSpacing: '0.08em',
+            }}>Overview</span>
+            <span style={{ flex: 1, height: '1px', background: '#e5e7eb' }} />
+          </div>
+
+          {/* Info cards */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px' }}>
+            {PROJECT_INFO.map((item, i) => (
+              <div key={i} style={{
+                background: '#ffffff', borderRadius: '16px',
+                padding: '24px 28px', border: '1px solid #e5e7eb',
+                display: 'flex', alignItems: 'center', gap: '20px',
+              }}>
+                <div style={{
+                  width: '48px', height: '48px', borderRadius: '14px',
+                  background: '#f3f4f6',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '22px', flexShrink: 0,
+                }}>{item.icon}</div>
+                <div>
+                  <div style={{
+                    fontSize: '11px', fontWeight: 700, textTransform: 'uppercase',
+                    letterSpacing: '0.08em', color: '#9ca3af', marginBottom: '4px',
+                  }}>{item.label}</div>
+                  <div style={{ fontSize: '16px', fontWeight: 600, color: '#111827' }}>
+                    {item.value}
                   </div>
                 </div>
-              ))}
-            </div>
-          </SectionReveal>
+              </div>
+            ))}
+          </div>
 
-          {/* Tech stack */}
-          <section className={styles.section}>
-            <SectionReveal>
-              <h2 className="h2" style={{ marginBottom: '2rem' }}>
-                Technology <span className="text-gradient-primary">Stack</span>
-              </h2>
-            </SectionReveal>
+          {/* Description */}
+          <div style={{
+            background: '#ffffff', borderRadius: '20px',
+            padding: '32px', border: '1px solid #e5e7eb',
+          }}>
+            <p style={{ fontSize: '1.05rem', color: '#4b5563', lineHeight: 1.8, marginBottom: '16px' }}>
+              In real-time video conferencing and streaming, network packet loss of even 10–30%
+              can render speech unintelligible and corrupt facial regions — especially around the
+              mouth area where lip movements encode crucial communication signals.
+            </p>
+            <p style={{ fontSize: '1.05rem', color: '#4b5563', lineHeight: 1.8 }}>
+              This project implements a <strong style={{ color: '#111827' }}>retrieval-based cross-modal restoration pipeline</strong> that
+              leverages the natural correlation between audio and video signals. Audio embeddings
+              guide video frame repair, while signal processing techniques restore corrupted
+              audio segments — all without requiring end-to-end deep learning training.
+            </p>
+          </div>
+        </div>
+      </section>
 
-            <div className={styles.techGrid}>
-              {TECH_STACK.map((tech, i) => (
-                <SectionReveal key={i} delay={(i % 4) * 0.08}>
-                  <div
-                    className={`glass-card ${styles.techCard}`}
-                    style={{ '--tech-color': tech.color, borderColor: `${tech.color}20` }}
-                  >
-                    <div className={styles.techEmoji}>{tech.emoji}</div>
-                    <div className={styles.techName} style={{ color: tech.color }}>{tech.name}</div>
-                    <div className={styles.techDesc}>{tech.desc}</div>
-                  </div>
-                </SectionReveal>
-              ))}
-            </div>
-          </section>
+      {/* ─── REFERENCES & LINKS ─── */}
+      <section style={{ padding: '0 24px 80px' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '12px',
+            marginBottom: '32px',
+          }}>
+            <span style={{
+              fontSize: '13px', fontWeight: 800, color: '#6366f1',
+              textTransform: 'uppercase', letterSpacing: '0.1em',
+            }}>02</span>
+            <span style={{ flex: 1, height: '1px', background: '#e5e7eb' }} />
+            <span style={{
+              fontSize: '13px', fontWeight: 700, color: '#9ca3af',
+              textTransform: 'uppercase', letterSpacing: '0.08em',
+            }}>References & Links</span>
+            <span style={{ flex: 1, height: '1px', background: '#e5e7eb' }} />
+          </div>
 
-          {/* Acknowledgements */}
-          <section className={styles.section}>
-            <SectionReveal>
-              <h2 className="h2" style={{ marginBottom: '2rem' }}>
-                Acknowledgements
-              </h2>
-            </SectionReveal>
-
-            <div className={styles.ackGrid}>
-              {ACKNOWLEDGEMENTS.map((ack, i) => (
-                <SectionReveal key={i} delay={i * 0.1}>
-                  <a href={ack.link} target="_blank" rel="noopener noreferrer" className={`glass-card ${styles.ackCard}`} style={{ borderColor: `${ack.color}30` }}>
-                    <div style={{ width: 4, height: '100%', minHeight: 60, background: ack.color, borderRadius: '4px', flexShrink: 0 }} />
-                    <div>
-                      <div className={styles.ackName} style={{ color: ack.color }}>{ack.name}</div>
-                      <p className={styles.ackDesc}>{ack.desc}</p>
-                    </div>
-                  </a>
-                </SectionReveal>
-              ))}
-            </div>
-          </section>
-
-          {/* GitHub CTA */}
-          <SectionReveal>
-            <div className={styles.ctaBlock}>
-              <div className={styles.ctaGlow} />
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style={{ color: 'var(--text-secondary)' }}>
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-              </svg>
-              <h2 className="h2" style={{ margin: '1rem 0 0.75rem' }}>View the Source Code</h2>
-              <p style={{ maxWidth: '45ch', textAlign: 'center', marginBottom: '2rem' }}>
-                The full pipeline, evaluation scripts, and batch generation tools are available on GitHub.
-              </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {LINKS.map((link, i) => (
               <a
-                href="https://github.com/sudarshan026/AV-Restoration"
+                key={i}
+                href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary"
-                style={{ fontSize: '1rem', padding: '0.875rem 2.5rem' }}
+                style={{
+                  background: '#ffffff', borderRadius: '16px',
+                  padding: '24px 28px', border: '1px solid #e5e7eb',
+                  display: 'flex', alignItems: 'center', gap: '20px',
+                  textDecoration: 'none', color: 'inherit',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = `${link.color}40`;
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.06)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = '#e5e7eb';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
               >
-                Open on GitHub ↗
+                <div style={{
+                  width: '48px', height: '48px', borderRadius: '14px',
+                  background: `${link.color}10`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '22px', flexShrink: 0,
+                }}>{link.icon}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{
+                    fontWeight: 700, fontSize: '16px', color: '#111827',
+                    marginBottom: '4px',
+                  }}>{link.label}</div>
+                  <div style={{ fontSize: '14px', color: '#6b7280', lineHeight: 1.5 }}>
+                    {link.desc}
+                  </div>
+                </div>
+                <div style={{
+                  fontSize: '18px', color: '#9ca3af', flexShrink: 0,
+                  fontWeight: 300,
+                }}>↗</div>
               </a>
-            </div>
-          </SectionReveal>
+            ))}
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* ─── FOOTER CTA ─── */}
+      <section style={{ padding: '96px 24px', background: '#fbbf24', textAlign: 'center' }}>
+        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+          <h2 style={{
+            fontSize: 'clamp(2rem, 4vw, 3rem)',
+            fontWeight: 800, color: '#111827',
+            letterSpacing: '-0.03em', lineHeight: 1.1, marginBottom: '16px',
+          }}>
+            Explore the source
+          </h2>
+          <p style={{ fontSize: '1.1rem', color: '#78350f', lineHeight: 1.7, marginBottom: '32px', fontWeight: 500 }}>
+            The full pipeline, evaluation scripts, and batch generation tools are open source.
+          </p>
+          <a
+            href="https://github.com/sudarshan026/AV-Restoration"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              padding: '14px 36px', borderRadius: '999px',
+              background: '#111827', color: '#ffffff',
+              fontWeight: 700, fontSize: '1rem', textDecoration: 'none',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+              transition: 'all 0.3s ease',
+            }}
+          >
+            Open on GitHub ↗
+          </a>
+        </div>
+      </section>
     </div>
   );
 }
